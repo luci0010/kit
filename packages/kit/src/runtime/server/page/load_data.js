@@ -240,6 +240,7 @@ export async function load_data({
 					data: server_data_node?.data ?? null,
 					route: event.route,
 					fetch: create_universal_fetch(event, state, fetched, csr, resolve_opts),
+					cookies: event.cookies,
 					setHeaders: event.setHeaders,
 					depends: () => {},
 					parent,
