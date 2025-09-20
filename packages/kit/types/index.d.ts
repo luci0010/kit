@@ -1015,13 +1015,17 @@ declare module '@sveltejs/kit' {
 		 * - During server-side rendering, the response will be captured and inlined into the rendered HTML by hooking into the `text` and `json` methods of the `Response` object. Note that headers will _not_ be serialized, unless explicitly included via [`filterSerializedResponseHeaders`](https://svelte.dev/docs/kit/hooks#Server-hooks-handle)
 		 * - During hydration, the response will be read from the HTML, guaranteeing consistency and preventing an additional network request.
 		 *
-		 * You can learn more about making credentialed requests with cookies [here](https://svelte.dev/docs/kit/load#Cookies)
-		 */
-		fetch: typeof fetch;
-		/**
-		 * Contains the data returned by the route's server `load` function (in `+layout.server.js` or `+page.server.js`), if any.
-		 */
-		data: Data;
+                * You can learn more about making credentialed requests with cookies [here](https://svelte.dev/docs/kit/load#Cookies)
+                */
+               fetch: typeof fetch;
+               /**
+                * Get or set cookies related to the current request. This property is only available during server-side rendering and will throw when used in the browser.
+                */
+               cookies: Cookies;
+               /**
+                * Contains the data returned by the route's server `load` function (in `+layout.server.js` or `+page.server.js`), if any.
+                */
+               data: Data;
 		/**
 		 * If you need to set headers for the response, you can do so using the this method. This is useful if you want the page to be cached, for example:
 		 *

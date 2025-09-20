@@ -729,19 +729,23 @@ async function load_node({ loader, parent, url, params, route, server_data_node 
 		}
 	}
 
-	if (node.universal?.load) {
-		/** @param {string[]} deps */
-		function depends(...deps) {
-			for (const dep of deps) {
-				if (DEV) validate_depends(/** @type {string} */ (route.id), dep);
+        if (node.universal?.load) {
+                /** @param {string[]} deps */
+                function depends(...deps) {
+                        for (const dep of deps) {
+                                if (DEV) validate_depends(/** @type {string} */ (route.id), dep);
 
-				const { href } = new URL(dep, url);
-				uses.dependencies.add(href);
-			}
-		}
+                                const { href } = new URL(dep, url);
+                                uses.dependencies.add(href);
+                        }
+                }
 
-		/** @type {import('@sveltejs/kit').LoadEvent} */
-		const load_input = {
+                function cookies_error() {
+                        throw new Error('event.cookies is only available on the server');
+                }
+
+                /** @type {import('@sveltejs/kit').LoadEvent} */
+                const load_input = {
 			tracing: { enabled: false, root: noop_span, current: noop_span },
 			route: new Proxy(route, {
 				get: (target, key) => {
@@ -774,8 +778,8 @@ async function load_node({ loader, parent, url, params, route, server_data_node 
 				},
 				app.hash
 			),
-			async fetch(resource, init) {
-				if (resource instanceof Request) {
+                        async fetch(resource, init) {
+                                if (resource instanceof Request) {
 					// we're not allowed to modify the received `Request` object, so in order
 					// to fixup relative urls we create a new equivalent `init` object instead
 					init = {
@@ -811,10 +815,17 @@ async function load_node({ loader, parent, url, params, route, server_data_node 
 					depends(resolved.href);
 				}
 
-				return promise;
+                                return promise;
+                        },
+                        cookies: {
+                                get: cookies_error,
+                                getAll: cookies_error,
+                                set: cookies_error,
+                                delete: cookies_error,
+                                serialize: cookies_error
 			},
-			setHeaders: () => {}, // noop
-			depends,
+                        setHeaders: () => {}, // noop
+                        depends,
 			parent() {
 				if (is_tracking) {
 					uses.parent = true;

@@ -1542,6 +1542,18 @@ test.describe.serial('Cookies API', () => {
 		span = page.locator('#cookie-value');
 		expect(await span.innerText()).toContain('undefined');
 	});
+
+	test('event.cookies in universal load is server-only', async ({ page, app, javaScriptEnabled }) => {
+		await page.goto('/cookies');
+		expect(await page.locator('#client-cookie-error').innerText()).toBe('');
+
+		if (javaScriptEnabled) {
+			await app.goto('/cookies?client=1');
+			await expect(page.locator('#client-cookie-error')).toHaveText(
+				/event\.cookies is only available on the server/
+			);
+		}
+	});
 });
 
 test.describe('Serialization', () => {
